@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class GildedRoseTest {
 
-# This is a comment commenting the test
+// This is a comment commenting the test
 
     @Test
     public void foo() {
