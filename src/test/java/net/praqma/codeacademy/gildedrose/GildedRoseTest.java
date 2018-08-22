@@ -9,6 +9,7 @@ public class GildedRoseTest {
 // This is a comment commenting the test
 // Another comment
 // Different fro master
+// MOAR COMMENTS
 
     @Test
     public void foo() {
