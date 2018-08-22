@@ -1,20 +1,28 @@
+/* 
+    This is the Pretested Integration Jenkinsfile
+    It enables the pretested workflow for this repository, and will automatically be picked up by Jenkins
+*/
 node {
-    stage ('Preparation'){
-        checkout scm
+    stage("checkout") {
+        //Using the Pretested integration plugin to checkout out any branch in the ready namespace
+        checkout(
+            [$class: 'GitSCM', 
+            branches: [[name: '*/ready/**']], 
+            doGenerateSubmoduleConfigurations: false, 
+            extensions: [[$class: 'CleanBeforeCheckout'], 
+            pretestedIntegration(gitIntegrationStrategy: squash(), 
+            integrationBranch: 'master', 
+            repoName: 'origin')], 
+            submoduleCfg: [], 
+            userRemoteConfigs: [[credentialsId: 'sofusalbertsen', //remember to change credentials and url.
+            url: 'git@github.com:sofusalbertsen/pretested_jenkins.git']]])
     }
-    stage ('Build'){
-        sh 'docker run -i -v $PWD:/usr/src/mymaven -w /usr/src/mymaven --rm maven:3-jdk-8 mvn clean package'
-
+    stage("test"){
+        // run maven tests here
+        sh 'echo testing...'
     }
-    stage ('Test'){
-        sh 'docker run -i -v $PWD:/usr/src/mymaven -w /usr/src/mymaven --rm maven:3-jdk-8 mvn test'
-
-    }
-    stage ('Javadoc'){
-        echo 'Ladidadida ... computing ... javadoc generated ... speculating ... contemplating ... *javadoc archived successfully*'
-    }
-    stage ('Results'){
-        archiveArtifacts artifacts: 'target/gildedrose-*.jar', onlyIfSuccessful: true
-        
+    stage("publish"){
+        //This publishes the commit if the tests have run without errors
+        pretestedIntegrationPublisher()
     }
 }
